@@ -9,6 +9,7 @@ import (
 
 func Homepage(c *gin.Context) {
 	c.HTML(http.StatusOK, "index.tmpl", gin.H{
-		"title": config.GlobalConfig.HomepageName,
+		"title":    config.GlobalConfig.HomepageName,
+		"subtitle": "home",
 	})
 }
