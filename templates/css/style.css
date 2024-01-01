@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300');
+
+
+body {
+    background: #002724; /*337 x 5*/
+    color: #e0e0e0;
+    font-family: "Source Code Pro", monospace;
+    font-weight: 300;
+    font-size: 14pt;
+    min-width: 60em;
+  }
+
+  a {
+    text-decoration: none;
+    color: #adadad;
+  }
+  a:hover, a:focus {
+    color: #e0e0e0;
+  }
+
+  h1, h2 {
+    font-size: 1em;
+    font-weight: normal;
+  }
+
+  header h1 {
+    display: inline-block;
+    text-decoration: none;
+    color: #e0e0e0;
+    text-shadow: 0 0 2px #e0e0e0, 0 0 5px #e0e0e0;
+  }
+
+  header nav {
+    display: inline-block;
+  }
+  header nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: inline-block;
+  }
+  header nav li {
+    display: inline-block;
+    padding: 0 .6em;
+  }
+  header nav a {
+    display: inline-block;
+    text-decoration: none;
+    outline: none;
+  }
