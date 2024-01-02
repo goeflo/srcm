@@ -36,7 +36,10 @@ func initRouter() *gin.Engine {
 	// handle homepage templates
 	router.LoadHTMLGlob("templates/**/*.tmpl")
 	router.GET("/", handler.Homepage)
-	router.GET("/login", handler.Login)
+	router.GET("/login", handler.LoginGet)
+	router.POST("/login", handler.LoginPost)
+	router.GET("/registration", handler.Registration)
+	router.GET("/steam/callback", handler.SteamCallback)
 	router.Static("/css", "templates/css")
 	return router
 }

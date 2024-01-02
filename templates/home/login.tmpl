@@ -20,7 +20,18 @@
     </header>
 
     <main>
-        here comes the login
+        {{if .logged_in}}
+            logged in
+        {{else}}
+            <form method="POST">
+                <label>email:</label><input type="text" name="email" maxlength="40">
+                </br>
+                <label>password:</label><input type="text" name="password" maxlength="40">
+                </br>
+                <input type="submit" value="login">
+            </form>
+            <a href="/registration">[new registration via steam]</a>
+        {{end}}
     </main>
     
 

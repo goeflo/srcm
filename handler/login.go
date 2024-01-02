@@ -1,51 +1,22 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
-	"os"
-	"text/template"
 
 	"github.com/floriwan/srcm/pkg/config"
 	"github.com/gin-gonic/gin"
-	"github.com/markbates/goth"
-	"github.com/markbates/goth/gothic"
-	"github.com/markbates/goth/providers/steam"
 )
 
-func Login(c *gin.Context) {
+func LoginPost(c *gin.Context) {
+	fmt.Printf("http post\n")
+}
 
-	goth.UseProviders(
-		steam.New(os.Getenv("STEAM_KEY"), "/"),
-	)
-
-	values := c.Request.URL.Query()
-	values.Add("provider", "steam")
-	c.Request.URL.RawQuery = values.Encode()
-
-	if gothUser, err := gothic.CompleteUserAuth(c.Writer, c.Request); err == nil {
-		// TODO add user to database
-		t, _ := template.New("foo").Parse(userTemplate)
-		t.Execute(c.Writer, gothUser)
-	} else {
-		gothic.BeginAuthHandler(c.Writer, c.Request)
-	}
+func LoginGet(c *gin.Context) {
 
 	c.HTML(http.StatusOK, "login.tmpl", gin.H{
 		"title":    config.GlobalConfig.HomepageName,
 		"subtitle": "login",
 	})
-}
 
-var userTemplate = `
-<p><a href="/logout/{{.Provider}}">logout</a></p>
-<p>Name: {{.Name}} [{{.LastName}}, {{.FirstName}}]</p>
-<p>Email: {{.Email}}</p>
-<p>NickName: {{.NickName}}</p>
-<p>Location: {{.Location}}</p>
-<p>AvatarURL: {{.AvatarURL}} <img src="{{.AvatarURL}}"></p>
-<p>Description: {{.Description}}</p>
-<p>UserID: {{.UserID}}</p>
-<p>AccessToken: {{.AccessToken}}</p>
-<p>ExpiresAt: {{.ExpiresAt}}</p>
-<p>RefreshToken: {{.RefreshToken}}</p>
-`
+}
