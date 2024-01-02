@@ -23,6 +23,7 @@ func Login(c *gin.Context) {
 	c.Request.URL.RawQuery = values.Encode()
 
 	if gothUser, err := gothic.CompleteUserAuth(c.Writer, c.Request); err == nil {
+		// TODO add user to database
 		t, _ := template.New("foo").Parse(userTemplate)
 		t.Execute(c.Writer, gothUser)
 	} else {

@@ -10,7 +10,7 @@ type User struct {
 	ID               int64  `gorm:"uniqueIndex,primaryKey,not null;default:null"`
 	Name             string `gorm:"type:varchar(50);not null"`
 	Lastname         string `gorm:"type:varchar(50);not null"`
-	Password         string `gorm:"type:varchar(50);not null"`
+	Password         string `gorm:"type:varchar(50);not null;default:null"`
 	Email            string `gorm:"type:varchar(50);unique;not null;default:null"`
 	SteamID          string `gorm:"type:varchar(20);not null"`
 	VerificationCode string

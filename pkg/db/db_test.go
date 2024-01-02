@@ -3,6 +3,7 @@ package db
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/floriwan/srcm/pkg/config"
@@ -21,24 +22,28 @@ func TestMain(m *testing.M) {
 }
 
 func TestCreateDifferentUser(t *testing.T) {
-	config.GlobalConfig.DbSqliteFilename = t.TempDir() + "test.db"
+	config.GlobalConfig.DbSqliteFilename = filepath.Join(t.TempDir(), "test.db")
 	Initialize()
 	Migrate()
 
 	tcs := []tc{
 		{
 			u: model.User{},
+			e: fmt.Errorf("NOT NULL constraint failed: users.password"),
+		},
+		{
+			u: model.User{Password: "secret"},
 			e: fmt.Errorf("NOT NULL constraint failed: users.email"),
 		},
 		{
-			u: model.User{Email: "kermit@sesamstrasse.de"},
+			u: model.User{Password: "secret", Email: "kermit@sesamstrasse.de"},
 		},
 		{
-			u: model.User{Email: "kermit@sesamstrasse.de"},
+			u: model.User{Password: "secret", Email: "kermit@sesamstrasse.de"},
 			e: fmt.Errorf("UNIQUE constraint failed: users.email"),
 		},
 		{
-			u: model.User{Email: "grobi@sesamstrasse.de"},
+			u: model.User{Password: "secret", Email: "grobi@sesamstrasse.de"},
 		},
 	}
 
@@ -55,5 +60,12 @@ func TestCreateDifferentUser(t *testing.T) {
 		}
 		fmt.Printf("create user id:%v\n", tc.u.ID)
 	}
+
+	users := []model.User{}
+	r := Instance.Find(&users)
+	if r.RowsAffected != 2 {
+		t.Fatalf("should get 2 rows, but got %v\n", r.RowsAffected)
+	}
+	fmt.Printf("\n%+v\n", users)
 
 }
