@@ -3,17 +3,16 @@ package model
 import (
 	"time"
 
-	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
-	ID               uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
-	Name             string    `gorm:"type:varchar(255);not null"`
-	Lastname         string    `json:"lastname" binding:"required"`
-	Password         string    `gorm:"not null"`
-	Email            string    `gorm:"uniqueIndex;not null"`
-	SteamID          string    `gorm:"not null"`
+	ID               int64  `gorm:"uniqueIndex,primaryKey,not null;default:null"`
+	Name             string `gorm:"type:varchar(50);not null"`
+	Lastname         string `gorm:"type:varchar(50);not null"`
+	Password         string `gorm:"type:varchar(50);not null"`
+	Email            string `gorm:"type:varchar(50);unique;not null;default:null"`
+	SteamID          string `gorm:"type:varchar(20);not null"`
 	VerificationCode string
 	Verified         bool      `gorm:"not null"`
 	CreatedAt        time.Time `gorm:"not null"`

@@ -3,6 +3,7 @@ package db
 import (
 	"log"
 
+	"github.com/floriwan/srcm/pkg/config"
 	"github.com/floriwan/srcm/pkg/db/model"
 	"gorm.io/driver/sqlite" // Sqlite driver based on CGO
 	"gorm.io/gorm"
@@ -11,7 +12,7 @@ import (
 var Instance *gorm.DB
 
 func Initialize() {
-	db, err := gorm.Open(sqlite.Open("gorm.db"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(config.GlobalConfig.DbSqliteFilename), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -19,6 +20,8 @@ func Initialize() {
 }
 
 func Migrate() {
-	Instance.AutoMigrate(&model.User{})
-	log.Println("Database Migration Completed!")
+	if err := Instance.AutoMigrate(&model.User{}); err != nil {
+		log.Fatal(err)
+	}
+	log.Println("db migration complete")
 }
