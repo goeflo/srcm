@@ -33,6 +33,10 @@ type JwtCustomClaims struct {
 	jwt.RegisteredClaims
 }
 
+func (h *Handler) Register(c echo.Context) error {
+	return c.String(http.StatusNotImplemented, "")
+}
+
 func (h *Handler) Login(c echo.Context) error {
 	email := c.FormValue("email")
 	password := c.FormValue("password")
@@ -74,7 +78,7 @@ func (h *Handler) Login(c echo.Context) error {
 	})
 }
 
-func (h *Handler) NewUser(c echo.Context) error {
+func (h *Handler) CreateUser(c echo.Context) error {
 	// Get name and email
 	email := c.FormValue("email")
 	passwd := c.FormValue("passwd")
@@ -87,7 +91,11 @@ func (h *Handler) GetUser(c echo.Context) error {
 	return c.String(http.StatusOK, "get user: "+id)
 }
 
-func (h *Handler) GetUserList(c echo.Context) error {
+func (h *Handler) GetAllUsers(c echo.Context) error {
+	return c.String(http.StatusNotImplemented, "")
+}
+
+func (h *Handler) DeleteUser(c echo.Context) error {
 	return c.String(http.StatusNotImplemented, "")
 }
 

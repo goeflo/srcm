@@ -1,6 +1,8 @@
 package main
 
 import (
+	"html/template"
+	"io"
 	"log"
 	"net/http"
 
@@ -12,6 +14,11 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
+
+// TemplateRenderer is a custom html/template renderer for Echo framework
+type TemplateRenderer struct {
+	templates *template.Template
+}
 
 func main() {
 
@@ -36,11 +43,15 @@ func main() {
 	e.HideBanner = true
 	e.Use(middleware.Recover())
 
+	renderer := &TemplateRenderer{
+		templates: template.Must(template.ParseGlob("public/views/*.html")),
+	}
+	e.Renderer = renderer
+
 	// routes
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
-	})
+	e.GET("/", h.Root)
 	e.POST("/login", h.Login)
+	e.POST("/login", h.Register)
 
 	g := e.Group("/restricted")
 
@@ -53,10 +64,11 @@ func main() {
 	))
 
 	g.GET("", restricted)
+	g.POST("/users", h.CreateUser)
+	g.GET("/users", h.GetAllUsers)
 	g.GET("/users/:id", h.GetUser)
-	g.POST("/users/:id/update", h.UpdateUser)
-	g.POST("/users/new", h.NewUser)
-	g.GET("/users/list", h.GetUserList)
+	g.PUT("/users/:id", h.UpdateUser)
+	e.DELETE("/users/:id", h.DeleteUser)
 
 	e.Logger.Fatal(e.Start(":" + srcm_config.GlobalConfig.HttpPort))
 
@@ -68,4 +80,15 @@ func restricted(c echo.Context) error {
 	claims := user.Claims.(*srcm_handler.JwtCustomClaims)
 	name := claims.Email
 	return c.String(http.StatusOK, "Welcome "+name+"!")
+}
+
+// Render renders a template document
+func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+
+	// Add global methods if data is a map
+	if viewContext, isMap := data.(map[string]interface{}); isMap {
+		viewContext["reverse"] = c.Echo().Reverse
+	}
+
+	return t.templates.ExecuteTemplate(w, name, data)
 }
