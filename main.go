@@ -6,7 +6,7 @@ import (
 
 	srcm_config "github.com/floriwan/srcm/pkg/config"
 	srcm_db "github.com/floriwan/srcm/pkg/db"
-	srcm_router "github.com/floriwan/srcm/router"
+	srcm_handler "github.com/floriwan/srcm/pkg/handler"
 	"github.com/golang-jwt/jwt/v5"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
@@ -25,6 +25,9 @@ func main() {
 	srcm_db.Initialize()
 	srcm_db.Migrate()
 
+	// initialize the handler
+	h := &srcm_handler.Handler{DB: srcm_db.Instance}
+
 	// create echo instance with middleware
 	e := echo.New()
 	if srcm_config.GlobalConfig.LogLevel == "debug" {
@@ -37,48 +40,32 @@ func main() {
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
-
-	e.POST("/login", srcm_router.Login)
+	e.POST("/login", h.Login)
 
 	g := e.Group("/restricted")
 
 	g.Use(echojwt.WithConfig(
 		echojwt.Config{
 			NewClaimsFunc: func(c echo.Context) jwt.Claims {
-				return new(srcm_router.JwtCustomClaims)
+				return new(srcm_handler.JwtCustomClaims)
 			},
 			SigningKey: []byte("secret")},
 	))
 
 	g.GET("", restricted)
-	g.GET("/users/:id", srcm_router.GetUser)
-	g.POST("/users/:id/update", srcm_router.UpdateUser)
-	g.POST("/users/new", srcm_router.NewUser)
-	g.GET("/users/list", srcm_router.GetUserList)
+	g.GET("/users/:id", h.GetUser)
+	g.POST("/users/:id/update", h.UpdateUser)
+	g.POST("/users/new", h.NewUser)
+	g.GET("/users/list", h.GetUserList)
 
 	e.Logger.Fatal(e.Start(":" + srcm_config.GlobalConfig.HttpPort))
 
-	/*
-		log.Printf("starting ...")
-
-		err := config.LoadConfig(".")
-		if err != nil {
-			log.Fatal("could not load configation file", err)
-		}
-
-		// create database
-		db.Initialize()
-		db.Migrate()
-
-		// Initialize Router
-		router := initRouter()
-		router.Run(":" + config.GlobalConfig.HttpPort)
-	*/
 }
 
+// test restricted access
 func restricted(c echo.Context) error {
 	user := c.Get("user").(*jwt.Token)
-	claims := user.Claims.(*srcm_router.JwtCustomClaims)
+	claims := user.Claims.(*srcm_handler.JwtCustomClaims)
 	name := claims.Email
 	return c.String(http.StatusOK, "Welcome "+name+"!")
 }
