@@ -9,6 +9,8 @@ var GlobalConfig Config = Config{}
 type Config struct {
 	HomepageName     string `mapstructure:"HOMEPAGE_NAME"`
 	DbSqliteFilename string `mapstructure:"DB_SQLITE_FILENAME"`
+	HttpPort         string `mapstructure:"HTTP_PORT"`
+	LogLevel         string `mapstructure:"LOG_LEVEL"`
 }
 
 func LoadConfig(path string) error {

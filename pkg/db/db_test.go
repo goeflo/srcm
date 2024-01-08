@@ -15,6 +15,30 @@ type tc struct {
 	e error
 }
 
+var dbCreateUserTests = []struct {
+	u model.User
+	e error
+}{
+	{
+		u: model.User{},
+		e: fmt.Errorf("NOT NULL constraint failed: users.password"),
+	},
+	{
+		u: model.User{Password: "secret"},
+		e: fmt.Errorf("NOT NULL constraint failed: users.email"),
+	},
+	{
+		u: model.User{Password: "secret", Email: "kermit@sesamstrasse.de"},
+	},
+	{
+		u: model.User{Password: "secret", Email: "kermit@sesamstrasse.de"},
+		e: fmt.Errorf("UNIQUE constraint failed: users.email"),
+	},
+	{
+		u: model.User{Password: "secret", Email: "grobi@sesamstrasse.de"},
+	},
+}
+
 func TestMain(m *testing.M) {
 	config.GlobalConfig = config.Config{}
 	testResult := m.Run()
@@ -26,28 +50,7 @@ func TestCreateDifferentUser(t *testing.T) {
 	Initialize()
 	Migrate()
 
-	tcs := []tc{
-		{
-			u: model.User{},
-			e: fmt.Errorf("NOT NULL constraint failed: users.password"),
-		},
-		{
-			u: model.User{Password: "secret"},
-			e: fmt.Errorf("NOT NULL constraint failed: users.email"),
-		},
-		{
-			u: model.User{Password: "secret", Email: "kermit@sesamstrasse.de"},
-		},
-		{
-			u: model.User{Password: "secret", Email: "kermit@sesamstrasse.de"},
-			e: fmt.Errorf("UNIQUE constraint failed: users.email"),
-		},
-		{
-			u: model.User{Password: "secret", Email: "grobi@sesamstrasse.de"},
-		},
-	}
-
-	for _, tc := range tcs {
+	for _, tc := range dbCreateUserTests {
 		r := Instance.Debug().Create(&tc.u)
 		if tc.e != nil {
 			if r.Error.Error() != tc.e.Error() {

@@ -17,6 +17,7 @@ func Initialize() {
 		log.Fatal(err)
 	}
 	Instance = db
+	polulateInitialData()
 }
 
 func Migrate() {
@@ -24,4 +25,18 @@ func Migrate() {
 		log.Fatal(err)
 	}
 	log.Println("db migration complete")
+}
+
+func polulateInitialData() {
+
+	res := Instance.First(&model.User{Email: "admin"})
+	if res.Error != nil {
+		log.Printf("create initial db data ...")
+		// create admin user
+		user := &model.User{Email: "admin"}
+		user.HashPassword("1234")
+
+		Instance.Create(&user)
+	}
+
 }

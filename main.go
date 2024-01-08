@@ -2,44 +2,83 @@ package main
 
 import (
 	"log"
+	"net/http"
 
-	"github.com/floriwan/srcm/handler"
-	"github.com/floriwan/srcm/pkg/config"
-	"github.com/floriwan/srcm/pkg/db"
-	"github.com/gin-gonic/gin"
+	srcm_config "github.com/floriwan/srcm/pkg/config"
+	srcm_db "github.com/floriwan/srcm/pkg/db"
+	srcm_router "github.com/floriwan/srcm/router"
+	"github.com/golang-jwt/jwt/v5"
+	echojwt "github.com/labstack/echo-jwt/v4"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
-	log.Printf("starting ...")
 
-	err := config.LoadConfig(".")
+	// load config
+	err := srcm_config.LoadConfig(".")
 	if err != nil {
 		log.Fatal("could not load configation file", err)
 	}
 
 	// create database
-	db.Initialize()
-	db.Migrate()
+	srcm_db.Initialize()
+	srcm_db.Migrate()
 
-	// Initialize Router
-	router := initRouter()
-	router.Run(":8081")
+	// create echo instance with middleware
+	e := echo.New()
+	if srcm_config.GlobalConfig.LogLevel == "debug" {
+		e.Debug = true
+	}
+	e.HideBanner = true
+	e.Use(middleware.Recover())
+
+	// routes
+	e.GET("/", func(c echo.Context) error {
+		return c.String(http.StatusOK, "Hello, World!")
+	})
+
+	e.POST("/login", srcm_router.Login)
+
+	g := e.Group("/restricted")
+
+	g.Use(echojwt.WithConfig(
+		echojwt.Config{
+			NewClaimsFunc: func(c echo.Context) jwt.Claims {
+				return new(srcm_router.JwtCustomClaims)
+			},
+			SigningKey: []byte("secret")},
+	))
+
+	g.GET("", restricted)
+	g.GET("/users/:id", srcm_router.GetUser)
+	g.POST("/users/:id/update", srcm_router.UpdateUser)
+	g.POST("/users/new", srcm_router.NewUser)
+	g.GET("/users/list", srcm_router.GetUserList)
+
+	e.Logger.Fatal(e.Start(":" + srcm_config.GlobalConfig.HttpPort))
+
+	/*
+		log.Printf("starting ...")
+
+		err := config.LoadConfig(".")
+		if err != nil {
+			log.Fatal("could not load configation file", err)
+		}
+
+		// create database
+		db.Initialize()
+		db.Migrate()
+
+		// Initialize Router
+		router := initRouter()
+		router.Run(":" + config.GlobalConfig.HttpPort)
+	*/
 }
 
-func initRouter() *gin.Engine {
-	gin.SetMode(gin.DebugMode)
-	router := gin.Default()
-
-	// https://github.com/gin-gonic/gin/blob/v1.9.0/docs/doc.md#dont-trust-all-proxies
-	router.SetTrustedProxies([]string{"localhost"})
-
-	// handle homepage templates
-	router.LoadHTMLGlob("templates/**/*.tmpl")
-	router.GET("/", handler.Homepage)
-	router.GET("/login", handler.LoginGet)
-	router.POST("/login", handler.LoginPost)
-	router.GET("/registration", handler.Registration)
-	router.GET("/steam/callback", handler.SteamCallback)
-	router.Static("/css", "templates/css")
-	return router
+func restricted(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(*srcm_router.JwtCustomClaims)
+	name := claims.Email
+	return c.String(http.StatusOK, "Welcome "+name+"!")
 }

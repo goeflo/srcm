@@ -22,3 +22,6 @@ go.work
 
 logs/*
 app.env
+
+# configured database file
+srcm.db
