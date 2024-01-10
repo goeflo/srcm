@@ -10,6 +10,7 @@ type Config struct {
 	HomepageName     string `mapstructure:"HOMEPAGE_NAME"`
 	DbSqliteFilename string `mapstructure:"DB_SQLITE_FILENAME"`
 	HttpPort         string `mapstructure:"HTTP_PORT"`
+	RestPort         string `mapstructure:"REST_PORT"`
 	LogLevel         string `mapstructure:"LOG_LEVEL"`
 }
 
