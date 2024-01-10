@@ -2,10 +2,12 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"net/http/httputil"
 
+	"github.com/floriwan/srcm/pkg/db/model"
 	"github.com/go-chi/render"
 )
 
@@ -45,6 +47,28 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// read user from database
+	u := model.User{Email: d.Email}
+	res := h.DB.Where("email = ?", d.Email).First(&u)
+
+	// error occured or user not found error
+	if res.Error != nil {
+		render.Render(w, r, ErrStatusUnauthorized(res.Error))
+		return
+	}
+	if res.RowsAffected == 0 {
+		render.Render(w, r, ErrStatusUnauthorized(fmt.Errorf("user email '%v' not found", d.Email)))
+		return
+	}
+
+	// verify password
+	if err := u.CheckPassword(d.Passwd); err != nil {
+		render.Render(w, r, ErrStatusUnauthorized(fmt.Errorf("wrong password for email '%v'", d.Email)))
+		return
+	}
+
+	// response with token TODO
+
 	w.Write([]byte("login"))
 }
 
@@ -62,11 +86,20 @@ func (e *ErrResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+func ErrStatusUnauthorized(err error) render.Renderer {
+	return &ErrResponse{
+		Err:            err,
+		HTTPStatusCode: http.StatusUnauthorized,
+		StatusText:     http.StatusText(http.StatusUnauthorized),
+		ErrorText:      err.Error(),
+	}
+}
+
 func ErrInvalidRequest(err error) render.Renderer {
 	return &ErrResponse{
 		Err:            err,
-		HTTPStatusCode: 400,
-		StatusText:     "Invalid request.",
+		HTTPStatusCode: http.StatusBadRequest,
+		StatusText:     http.StatusText(http.StatusBadRequest),
 		ErrorText:      err.Error(),
 	}
 }

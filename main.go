@@ -16,15 +16,16 @@ import (
 
 func main() {
 
-	// create database
-	db.Initialize()
-	db.Migrate()
-
 	// load config
 	err := config.LoadConfig(".")
 	if err != nil {
 		log.Fatal("could not load configation file", err)
 	}
+
+	// create database
+	db.Initialize()
+	db.Migrate()
+	db.PolulateInitialData()
 
 	// initialize the handler
 	h := &handler.Handler{DB: db.Instance, Config: config.GlobalConfig}

@@ -17,7 +17,6 @@ func Initialize() {
 		log.Fatal(err)
 	}
 	Instance = db
-	polulateInitialData()
 }
 
 func Migrate() {
@@ -27,16 +26,20 @@ func Migrate() {
 	log.Println("db migration complete")
 }
 
-func polulateInitialData() {
+func PolulateInitialData() {
 
-	res := Instance.First(&model.User{Email: "admin"})
+	res := Instance.Where("email = ?", "admin").First(&model.User{})
 	if res.Error != nil {
 		log.Printf("create initial db data ...")
 		// create admin user
 		user := &model.User{Email: "admin"}
 		user.HashPassword("1234")
 
-		Instance.Create(&user)
+		result := Instance.Create(&user)
+		if res.Error != nil {
+			log.Fatal(res.Error)
+		}
+		log.Printf("rows effected: %v\n", result.RowsAffected)
 	}
 
 }
