@@ -6,9 +6,12 @@ import (
 	"log"
 	"net/http"
 	"net/http/httputil"
+	"time"
 
 	"github.com/floriwan/srcm/pkg/db/model"
+	"github.com/floriwan/srcm/pkg/jwtauth"
 	"github.com/go-chi/render"
+	"github.com/lestrrat-go/jwx/v2/jwt"
 )
 
 type LoginRequest struct {
@@ -67,9 +70,15 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// response with token TODO
+	// generate jwt token for valid email address
+	var tokenAuth *jwtauth.JWTAuth
+	tokenAuth = jwtauth.New("HS256", []byte("secret"), nil, jwt.WithAcceptableSkew(30*time.Second))
+	_, tokenString, _ := tokenAuth.Encode(map[string]interface{}{"email": d.Email})
+	//	log.Printf("DEBUG: a sample jwt is %s\n\n", tokenString)
+	//	log.Printf("DEBUG: a sample jwt is %s\n\n", t)
 
-	w.Write([]byte("login"))
+	w.Write([]byte(tokenString))
+
 }
 
 type ErrResponse struct {
@@ -84,6 +93,15 @@ type ErrResponse struct {
 func (e *ErrResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	render.Status(r, e.HTTPStatusCode)
 	return nil
+}
+
+func ErrStatusInternalServerError(err error) render.Renderer {
+	return &ErrResponse{
+		Err:            err,
+		HTTPStatusCode: http.StatusInternalServerError,
+		StatusText:     http.StatusText(http.StatusInternalServerError),
+		ErrorText:      err.Error(),
+	}
 }
 
 func ErrStatusUnauthorized(err error) render.Renderer {
