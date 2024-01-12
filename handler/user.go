@@ -32,6 +32,10 @@ func (a *LoginRequest) Bind(r *http.Request) error {
 /*
 send login request:
 curl -X POST -d '{"email":"flo","passwd":"1234"}' localhost:8081/login
+
+get response with token and get restricted access:
+curl localhost:8081/restricted/user/bla -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluIn0.A9dz8H4vRCdMb39m6nOlnl_HbF5zgof5LrLm2i0xEY0"
+
 */
 
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
