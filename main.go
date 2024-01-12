@@ -10,6 +10,7 @@ import (
 	"github.com/floriwan/srcm/pkg/config"
 	"github.com/floriwan/srcm/pkg/db"
 	"github.com/floriwan/srcm/pkg/jwtauth"
+	"github.com/floriwan/srcm/pkg/templates"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
@@ -30,7 +31,16 @@ func main() {
 	db.PolulateInitialData()
 
 	// initialize the handler
-	h := &handler.Handler{DB: db.Instance, Config: config.GlobalConfig}
+	h := &handler.Handler{
+		DB:     db.Instance,
+		Config: config.GlobalConfig,
+		Tmpl:   templates.NewTmpl(),
+	}
+
+	// load all html templates
+	if err := h.Tmpl.Load("./templates/", ".tmpl"); err != nil {
+		log.Fatal(err)
+	}
 
 	r := chi.NewRouter()
 
@@ -52,6 +62,7 @@ func main() {
 	})
 	r.Post("/login", h.Login)
 	r.Mount("/home", templateRouter(h))
+	r.Mount("/assets", assetsServer(h))
 
 	// protected route
 	r.Mount("/restricted", restrictedRouter())
@@ -59,6 +70,16 @@ func main() {
 	addr := ":" + config.GlobalConfig.RestPort
 	fmt.Printf("starting server on %v\n", addr)
 	http.ListenAndServe(addr, r)
+}
+
+func assetsServer(h *handler.Handler) chi.Router {
+	log.Printf("assets ...")
+	r := chi.NewRouter()
+
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("assets ...")
+	})
+	return r
 }
 
 func templateRouter(h *handler.Handler) chi.Router {
