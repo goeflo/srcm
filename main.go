@@ -68,25 +68,20 @@ func main() {
 	r.Mount("/restricted", restrictedRouter())
 
 	addr := ":" + config.GlobalConfig.RestPort
-	fmt.Printf("starting server on %v\n", addr)
+	log.Printf("starting server on %v\n", addr)
 	http.ListenAndServe(addr, r)
 }
 
 func assetsServer(h *handler.Handler) chi.Router {
-	log.Printf("assets ...")
 	r := chi.NewRouter()
-
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("assets ...")
-	})
+	r.Get("/", h.Assets)
+	r.Get("/css/*", h.Css)
 	return r
 }
 
 func templateRouter(h *handler.Handler) chi.Router {
 	r := chi.NewRouter()
-
-	r.Get("/", h.Home)
-
+	r.Get("/*", h.Home)
 	return r
 }
 
