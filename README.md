@@ -1,8 +1,8 @@
 # srcm
 
-simple racing community manager
+:car: simple racing community manager
 
 or
 
-sim racing community manager
+:car: sim racing community manager
 
