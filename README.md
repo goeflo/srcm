@@ -4,5 +4,5 @@
 
 or
 
-:car: sim racing community manager
+:racing_car: sim racing community manager
 
