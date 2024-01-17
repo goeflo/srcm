@@ -1,5 +1,10 @@
 {{ template "globals/header.tmpl" .}}
 
+    <script>
+    
+
+    </script>
+
     <header>
     <div>
         <h1 class="page-title"><a href="/home/index.html">{{ .title }}</a></h1>
@@ -23,12 +28,13 @@
         {{if .logged_in}}
             logged in
         {{else}}
-            <form method="POST">
-                <label>email:</label><input type="text" name="email" maxlength="40">
+            <form action="" id="loginForm">
+                <label>email:</label><input type="text" name="email" id="email" maxlength="40">
                 </br>
-                <label>password:</label><input type="text" name="password" maxlength="40">
+                <label>password:</label><input type="text" name="password" id="password" maxlength="40">
                 </br>
-                <input type="submit" value="login">
+                <!-- <input type="submit" value="login"> -->
+                <button type="submit">submit</button>
             </form>
 
             <a href="/registration">[new registration]</a>

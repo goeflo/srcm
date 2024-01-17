@@ -32,14 +32,14 @@ func PolulateInitialData() {
 	if res.Error != nil {
 		log.Printf("create initial db data ...")
 		// create admin user
-		user := &model.User{Email: "admin"}
+		user := &model.User{Email: "admin", Admin: true}
 		user.HashPassword("1234")
 
-		result := Instance.Create(&user)
+		res := Instance.Create(&user)
 		if res.Error != nil {
-			log.Fatal(res.Error)
+			log.Fatalf("error creating initial admin user: %v\n", res.Error)
 		}
-		log.Printf("rows effected: %v\n", result.RowsAffected)
+		log.Printf("rows effected: %v\n", res.RowsAffected)
 	}
 
 }

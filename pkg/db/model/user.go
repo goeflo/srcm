@@ -1,22 +1,26 @@
 package model
 
 import (
-	"time"
-
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type User struct {
-	ID               int64  `gorm:"uniqueIndex,primaryKey,not null;default:null"`
-	Name             string `gorm:"type:varchar(50);not null"`
-	Lastname         string `gorm:"type:varchar(50);not null"`
-	Password         string `gorm:"type:varchar(50);not null;default:null"`
-	Email            string `gorm:"type:varchar(50);unique;not null;default:null"`
-	SteamID          string `gorm:"type:varchar(20);not null"`
-	VerificationCode string
-	Verified         bool      `gorm:"not null"`
-	CreatedAt        time.Time `gorm:"not null"`
-	UpdatedAt        time.Time `gorm:"not null"`
+	gorm.Model
+	Lastname         string  `gorm:"type:varchar(50);not null" json:"lastname"`
+	Password         string  `gorm:"type:varchar(50);not null;default:null" json:"password"`
+	Email            string  `gorm:"type:varchar(50);unique;not null;default:null" json:"email"`
+	SteamID          string  `gorm:"type:varchar(20);not null" json:"steamID"`
+	VerificationCode *string `json:"verificationCode"`
+	Verified         bool    `gorm:"not null" json:"verified"`
+	Active           bool    `gorm:"type:bool;default:true;not null" json:"active"`
+	Admin            bool    `gorm:"type:bool;default:false;not null" json:"admin"`
+}
+
+type UserToEvent struct {
+	UserID  int64
+	EventID int64
+	Car     Car
 }
 
 func (user *User) HashPassword(password string) error {

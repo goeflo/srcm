@@ -61,6 +61,11 @@ func TestCreateDifferentUser(t *testing.T) {
 				t.Fatalf("exptected no error, but got '%v'\n", r.Error)
 			}
 		}
+
+		if tc.u.Active != true {
+			t.Fatalf("user '%v' should be active, but is '%v'\n", tc.u.Email, tc.u.Active)
+		}
+
 		fmt.Printf("create user id:%v\n", tc.u.ID)
 	}
 
@@ -69,6 +74,7 @@ func TestCreateDifferentUser(t *testing.T) {
 	if r.RowsAffected != 2 {
 		t.Fatalf("should get 2 rows, but got %v\n", r.RowsAffected)
 	}
+
 	fmt.Printf("\n%+v\n", users)
 
 }

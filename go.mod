@@ -3,7 +3,7 @@ module github.com/floriwan/srcm
 go 1.20
 
 require (
-	github.com/go-chi/chi/v5 v5.0.11
+	github.com/go-chi/chi v1.5.5
 	github.com/go-chi/render v1.0.3
 	github.com/lestrrat-go/jwx v1.2.28
 	github.com/lestrrat-go/jwx/v2 v2.0.19
