@@ -38,3 +38,15 @@ func (user *User) CheckPassword(providedPassword string) error {
 	}
 	return nil
 }
+
+// func (user *User) GetByEmail(email string) error {
+// 	//u := User{}
+// 	res := db.Instance.Where("email = ?", email).First(&user)
+// 	if res.Error != nil {
+// 		return res.Error
+// 	}
+// 	if res.RowsAffected == 0 {
+// 		return fmt.Errorf("no user with email %v found", email)
+// 	}
+// 	return nil
+// }

@@ -1,0 +1,24 @@
+rest api
+    get user
+    create user
+    delete user
+    modify user
+
+    create event
+    delete event
+    modify event
+        add user entry
+        delete user entry
+        modify user entry
+        get entry list
+        get result
+        modify result / add penalties 
+
+    create season
+    delete season
+    modify season
+        add event
+        delete event
+        add user entry
+        delete user entry
+        modify user entry

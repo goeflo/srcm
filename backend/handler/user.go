@@ -66,23 +66,15 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	// }
 
 	// read user from database
-	u := model.User{Email: d.Email}
-	res := h.DB.Where("email = ?", d.Email).First(&u)
-
-	// error occured or user not found error
-	if res.Error != nil {
-		respondError(w, http.StatusUnauthorized, "")
-		//render.Render(w, r, ErrStatusUnauthorized(res.Error))
-		return
-	}
-	if res.RowsAffected == 0 {
-		respondError(w, http.StatusUnauthorized, fmt.Sprintf("user email '%v' not found", d.Email))
-		//render.Render(w, r, ErrStatusUnauthorized(fmt.Errorf("user email '%v' not found", d.Email)))
+	user := model.User{}
+	res := h.DB.Where("email = ?", d.Email).First(&user)
+	if res.Error != nil || res.RowsAffected == 0 {
+		respondError(w, http.StatusNotFound, fmt.Sprintf("no user with email '%v' found", d.Email))
 		return
 	}
 
 	// verify password
-	if err := u.CheckPassword(d.Passwd); err != nil {
+	if err := user.CheckPassword(d.Passwd); err != nil {
 		respondError(w, http.StatusUnauthorized, fmt.Sprintf("wrong password for email '%v'", d.Email))
 		//render.Render(w, r, ErrStatusUnauthorized(fmt.Errorf("wrong password for email '%v'", d.Email)))
 		return
@@ -99,10 +91,22 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// UserAPI is handler for /user
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	log.Printf("getUser handler\n")
 	w.Write([]byte(fmt.Sprintf("get user handler id %v", chi.URLParam(r, "id"))))
+	respondError(w, http.StatusNotImplemented, "")
+}
+
+func DeleteUser(w http.ResponseWriter, r *http.Request) {
+	log.Printf("deleteUser handler\n")
+	w.Write([]byte(fmt.Sprintf("delete user handler id %v", chi.URLParam(r, "id"))))
+	respondError(w, http.StatusNotImplemented, "")
+}
+
+func CreateUser(w http.ResponseWriter, r *http.Request) {
+	log.Printf("CreateUser handler\n")
+	w.Write([]byte("create user handler"))
+	respondError(w, http.StatusNotImplemented, "")
 }
 
 /*

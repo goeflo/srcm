@@ -18,6 +18,11 @@ var h *handler.Handler
 
 // Run will initialize database and start and run http api server
 // Using global config.GlobalConfig for configuration data
+//
+// @title simple racing community manager API
+// @version 0.1
+//
+// @BasePath /v1
 func Run() {
 	// create database
 	db.Initialize()

@@ -26,5 +26,7 @@ func adminRoutes(r chi.Router) {
 
 func dataRoutes(r chi.Router) {
 	r.Use(middleware.UserAuthenticator)
-	r.Get("/user{id}", handler.GetUser)
+	r.Get("/user/{id}", handler.GetUser)
+	r.Delete("/user/{id]", handler.DeleteUser)
+	r.Post("/user", handler.CreateUser)
 }
