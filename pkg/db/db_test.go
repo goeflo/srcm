@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/floriwan/srcm/pkg/config"
+	"github.com/floriwan/srcm/pkg/db/migration"
 	"github.com/floriwan/srcm/pkg/db/model"
 )
 
@@ -48,7 +49,8 @@ func TestMain(m *testing.M) {
 func TestCreateDifferentUser(t *testing.T) {
 	config.GlobalConfig.DbSqliteFilename = filepath.Join(t.TempDir(), "test.db")
 	Initialize()
-	Migrate()
+	m := migration.NewMigrator(Instance)
+	m.Migration()
 
 	for _, tc := range dbCreateUserTests {
 		r := Instance.Debug().Create(&tc.u)
