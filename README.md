@@ -1,5 +1,5 @@
 
-![go workflow](https://github.com/goeflo/srcm/blob/main/.github/workflows/go.yml/badge.svg)
+![go workflow](https://github.com/goeflo/srcm/actions/workflows/go.yml/badge.svg)
 
 # srcm
 
