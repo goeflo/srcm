@@ -15,15 +15,9 @@ type Event struct {
 	RaceLength time.Time
 }
 
-/*
-uint           `gorm:"primaryKey"`
-CreatedAt time.Time
-UpdatedAt time.Time
-DeletedAt gorm.DeletedAt `gorm:"index"`
-Name string
-*/
-type Series struct {
+type Season struct {
 	gorm.Model
+	Events []Event
 }
 
 type Car int

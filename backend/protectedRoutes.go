@@ -22,11 +22,16 @@ func protectedRoutes(r chi.Router) {
 func adminRoutes(r chi.Router) {
 	r.Use(middleware.AdminAuthenticator)
 	r.Get("/admin", handler.Admin)
+	r.Get("/user/{id}", handler.GetUser)
+	r.Delete("/user/{id}", handler.DeleteUser)
+	r.Post("/user", handler.CreateUser)
+
+	//r.Post("/event", handler.CreateEvent)
+	//r.Get("/event/{id}", handler.GetEvent)
+
 }
 
 func dataRoutes(r chi.Router) {
 	r.Use(middleware.UserAuthenticator)
 	r.Get("/user/{id}", handler.GetUser)
-	r.Delete("/user/{id]", handler.DeleteUser)
-	r.Post("/user", handler.CreateUser)
 }

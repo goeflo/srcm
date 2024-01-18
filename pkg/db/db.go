@@ -19,13 +19,6 @@ func Initialize() {
 	Instance = db
 }
 
-func Migrate() {
-	if err := Instance.AutoMigrate(&model.User{}); err != nil {
-		log.Fatal(err)
-	}
-	log.Println("db migration complete")
-}
-
 func PolulateInitialData() {
 
 	res := Instance.Where("email = ?", "admin").First(&model.User{})
@@ -39,6 +32,15 @@ func PolulateInitialData() {
 		if res.Error != nil {
 			log.Fatalf("error creating initial admin user: %v\n", res.Error)
 		}
+
+		// create user
+		user = &model.User{Email: "user", Admin: false}
+		user.HashPassword("1234")
+		res = Instance.Create(&user)
+		if res.Error != nil {
+			log.Fatalf("error creating initial admin user: %v\n", res.Error)
+		}
+
 		log.Printf("rows effected: %v\n", res.RowsAffected)
 	}
 

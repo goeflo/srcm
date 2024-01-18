@@ -8,6 +8,7 @@ import (
 	"github.com/floriwan/srcm/backend/handler"
 	"github.com/floriwan/srcm/pkg/config"
 	"github.com/floriwan/srcm/pkg/db"
+	"github.com/floriwan/srcm/pkg/db/migration"
 	"github.com/floriwan/srcm/pkg/templates"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -24,9 +25,12 @@ var h *handler.Handler
 //
 // @BasePath /v1
 func Run() {
+
 	// create database
 	db.Initialize()
-	db.Migrate()
+	m := migration.NewMigrator(db.Instance)
+	m.Migration()
+
 	db.PolulateInitialData()
 
 	// the handler for the routes

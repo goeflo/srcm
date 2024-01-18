@@ -58,25 +58,17 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 	json.Unmarshal(body, d)
 
-	// if err := render.Bind(r, d); err != nil {
-	// 	respondError(w, http.StatusBadRequest, "")
-	// 	return
-	// 	//render.Render(w, r, respondError(w, http.StatusBadRequest, "") )
-	// 	//return
-	// }
-
-	// read user from database
+	// get first element from db where email matches
 	user := model.User{}
-	res := h.DB.Where("email = ?", d.Email).First(&user)
-	if res.Error != nil || res.RowsAffected == 0 {
-		respondError(w, http.StatusNotFound, fmt.Sprintf("no user with email '%v' found", d.Email))
+	res := h.DB.Where(&model.User{Email: d.Email, Active: true}).First(&user)
+	if res.Error != nil {
+		respondError(w, http.StatusInternalServerError, res.Error.Error())
 		return
 	}
 
 	// verify password
 	if err := user.CheckPassword(d.Passwd); err != nil {
 		respondError(w, http.StatusUnauthorized, fmt.Sprintf("wrong password for email '%v'", d.Email))
-		//render.Render(w, r, ErrStatusUnauthorized(fmt.Errorf("wrong password for email '%v'", d.Email)))
 		return
 	}
 
@@ -94,19 +86,18 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	log.Printf("getUser handler\n")
 	w.Write([]byte(fmt.Sprintf("get user handler id %v", chi.URLParam(r, "id"))))
-	respondError(w, http.StatusNotImplemented, "")
 }
 
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
-	log.Printf("deleteUser handler\n")
-	w.Write([]byte(fmt.Sprintf("delete user handler id %v", chi.URLParam(r, "id"))))
-	respondError(w, http.StatusNotImplemented, "")
+	respondError(w, http.StatusNotImplemented, "delete user handler")
+	//log.Printf("getUser handler\n")
+	//w.Write([]byte(fmt.Sprintf("get user handler id %v", chi.URLParam(r, "id"))))
 }
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
-	log.Printf("CreateUser handler\n")
-	w.Write([]byte("create user handler"))
-	respondError(w, http.StatusNotImplemented, "")
+	respondError(w, http.StatusNotImplemented, "create user handler")
+	//log.Printf("getUser handler\n")
+	//w.Write([]byte(fmt.Sprintf("get user handler id %v", chi.URLParam(r, "id"))))
 }
 
 /*

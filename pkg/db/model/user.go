@@ -9,18 +9,20 @@ type User struct {
 	gorm.Model
 	Lastname         string  `gorm:"type:varchar(50);not null" json:"lastname"`
 	Password         string  `gorm:"type:varchar(50);not null;default:null" json:"password"`
-	Email            string  `gorm:"type:varchar(50);unique;not null;default:null" json:"email"`
+	Email            string  `gorm:"type:varchar(50);uniqueIndex;not null;default:null" json:"email"`
 	SteamID          string  `gorm:"type:varchar(20);not null" json:"steamID"`
 	VerificationCode *string `json:"verificationCode"`
 	Verified         bool    `gorm:"not null" json:"verified"`
 	Active           bool    `gorm:"type:bool;default:true;not null" json:"active"`
 	Admin            bool    `gorm:"type:bool;default:false;not null" json:"admin"`
+	Participations   []Participation
 }
 
-type UserToEvent struct {
-	UserID  int64
-	EventID int64
-	Car     Car
+type Participation struct {
+	gorm.Model
+	UserID  int `gorm:"not null"`
+	EventID int `gorm:"not null"`
+	Car     int `gorm:"not null"`
 }
 
 func (user *User) HashPassword(password string) error {
