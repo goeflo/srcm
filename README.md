@@ -1,10 +1,9 @@
+
+![go workflow](https://github.com/goeflo/srcm/blob/main/.github/workflows/go.yml/badge.svg)
+
 # srcm
 
-:car: simple racing community manager
-
-or
-
-:racing_car: sim racing community manager
+:car: sim racing community manager
 
 
 # build
