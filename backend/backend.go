@@ -9,41 +9,48 @@ import (
 	"github.com/floriwan/srcm/pkg/config"
 	"github.com/floriwan/srcm/pkg/db"
 	"github.com/floriwan/srcm/pkg/db/migration"
-	"github.com/floriwan/srcm/pkg/templates"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
 )
 
-var h *handler.Handler
+type Backend struct {
+	handler *handler.Handler
+}
 
-// Run will initialize database and start and run http api server
-// Using global config.GlobalConfig for configuration data
-//
-// @title simple racing community manager API
-// @version 0.1
-//
-// @BasePath /v1
-func Run() {
+// Initialize will create database with initial data and load config
+func Initialize() *Backend {
 
-	// create database
+	// load config
+	err := config.LoadConfig(".")
+	if err != nil {
+		log.Fatal("could not load configation file", err)
+	}
+
+	// create and populate database
 	db.Initialize()
 	m := migration.NewMigrator(db.Instance)
 	m.Migration()
-
 	db.PolulateInitialData()
 
-	// the handler for the routes
-	h = &handler.Handler{
+	// create new handler for routes
+	h := handler.Handler{
 		DB:     db.Instance,
 		Config: config.GlobalConfig,
-		Tmpl:   templates.NewTmpl(),
 	}
 
-	// load all html templates
-	if err := h.Tmpl.Load("./templates/", ".tmpl"); err != nil {
-		log.Fatal(err)
+	return &Backend{
+		handler: &h,
 	}
+}
+
+// Run start backend http server with config
+func (b *Backend) Run() {
+
+	// load all html templates
+	// if err := h.Tmpl.Load("./templates/", ".tmpl"); err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	r := chi.NewRouter()
 
@@ -59,10 +66,10 @@ func Run() {
 	// processing should be stopped.
 	r.Use(middleware.Timeout(60 * time.Second))
 
-	r.Group(publicRoutes)
-	r.Group(protectedRoutes)
+	r.Group(b.publicRoutes)
+	r.Group(b.protectedRoutes)
 
-	addr := ":" + config.GlobalConfig.RestPort
+	addr := ":" + b.handler.Config.RestPort
 	log.Printf("starting server on %v\n", addr)
 	http.ListenAndServe(addr, r)
 }

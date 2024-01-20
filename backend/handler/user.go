@@ -16,19 +16,24 @@ import (
 	"github.com/lestrrat-go/jwx/v2/jwt"
 )
 
-type LoginRequest struct {
-	Email  string `json:"email"`
-	Passwd string `json:"passwd"`
+type NewUserRequestData struct {
+	Email     string `json:"email"`
+	Passwd    string `json:"passwd"`
+	Lastname  string `json:"lastname"`
+	Firstname string `json:"firstname"`
 }
 
-func (a *LoginRequest) Bind(r *http.Request) error {
-	if a.Email == "" {
-		return errors.New("missing required email address for login")
+func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
+	log.Printf("create user handler\n")
+
+	if h.Config.LogLevel == "debug" {
+		reqDump, err := httputil.DumpRequest(r, true)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("%v\n", string(reqDump))
 	}
-	if a.Passwd == "" {
-		return errors.New("missing required password for login")
-	}
-	return nil
+
 }
 
 /*
@@ -39,6 +44,21 @@ get response with token and get restricted access:
 curl localhost:8081/restricted/user/bla -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluIn0.A9dz8H4vRCdMb39m6nOlnl_HbF5zgof5LrLm2i0xEY0"
 
 */
+
+type LoginRequestData struct {
+	Email  string `json:"email"`
+	Passwd string `json:"passwd"`
+}
+
+func (a *LoginRequestData) Bind(r *http.Request) error {
+	if a.Email == "" {
+		return errors.New("missing required email address for login")
+	}
+	if a.Passwd == "" {
+		return errors.New("missing required password for login")
+	}
+	return nil
+}
 
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	log.Printf("login handler\n")
@@ -51,7 +71,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		log.Printf("%v\n", string(reqDump))
 	}
 
-	d := &LoginRequest{}
+	d := &LoginRequestData{}
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		respondError(w, http.StatusBadRequest, err.Error())
@@ -83,19 +103,13 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func GetUser(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetUser(w http.ResponseWriter, r *http.Request) {
 	log.Printf("getUser handler\n")
 	w.Write([]byte(fmt.Sprintf("get user handler id %v", chi.URLParam(r, "id"))))
 }
 
-func DeleteUser(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	respondError(w, http.StatusNotImplemented, "delete user handler")
-	//log.Printf("getUser handler\n")
-	//w.Write([]byte(fmt.Sprintf("get user handler id %v", chi.URLParam(r, "id"))))
-}
-
-func CreateUser(w http.ResponseWriter, r *http.Request) {
-	respondError(w, http.StatusNotImplemented, "create user handler")
 	//log.Printf("getUser handler\n")
 	//w.Write([]byte(fmt.Sprintf("get user handler id %v", chi.URLParam(r, "id"))))
 }
