@@ -1,5 +1,18 @@
 package handler
 
+import (
+	"log"
+	"net/http"
+	"strings"
+)
+
+func (h *Handler) Assets(w http.ResponseWriter, r *http.Request) {
+	log.Printf("asset handler %v\n", r.URL.Path)
+	filename := strings.TrimRight(r.URL.Path, "/")
+	w.Header().Set("Content-Type", "text/css; charset=utf-8")
+	http.ServeFile(w, r, filename)
+}
+
 // import (
 // 	"fmt"
 // 	"log"
