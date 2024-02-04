@@ -1,4 +1,5 @@
 rest api
+    verify user - via email link
     get user
     create user
     delete user

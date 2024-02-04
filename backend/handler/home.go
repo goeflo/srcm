@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"html/template"
 	"log"
 	"net/http"
 )
@@ -10,6 +11,17 @@ var ext = ".html"
 func (h *Handler) Home(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("home handler\n")
+
+	file, err := template.ParseFiles("templates/index.html")
+	if err != nil {
+		respondError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	tmpl := template.Must(file, err)
+	tmpl.Execute(w, nil)
+
+	//h.Tmpl.ExecuteTemplate(w, "public/index.html")
 
 	// log.Printf("-> handle home %s %s %s", r.RemoteAddr, r.Method, r.URL)
 

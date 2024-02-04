@@ -7,9 +7,9 @@ import (
 
 type User struct {
 	gorm.Model
-	Lastname         string  `gorm:"type:varchar(50);not null" json:"lastname"`
-	Firstname        string  `gorm:"type:varchar(50);not null" json:"firstname"`
-	Password         string  `gorm:"type:varchar(50);not null;default:null" json:"password"`
+	Lastname         string  `gorm:"type:varchar(50)" json:"lastname"`
+	Firstname        string  `gorm:"type:varchar(50)" json:"firstname"`
+	Password         string  `gorm:"type:varchar(50)" json:"password"`
 	Email            string  `gorm:"type:varchar(50);uniqueIndex;not null;default:null" json:"email"`
 	SteamID          string  `gorm:"type:varchar(20);not null" json:"steamID"`
 	VerificationCode *string `json:"verificationCode"`
