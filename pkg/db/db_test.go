@@ -16,26 +16,26 @@ type tc struct {
 	e error
 }
 
-var dbCreateUserTests = []struct {
+var dbCreateUserTests = map[string]struct {
 	u model.User
 	e error
 }{
-	{
+	"create empty user": {
 		u: model.User{},
-		e: fmt.Errorf("NOT NULL constraint failed: users.password"),
+		e: fmt.Errorf("NOT NULL constraint failed: users.email"),
 	},
-	{
+	"create user with password": {
 		u: model.User{Password: "secret"},
 		e: fmt.Errorf("NOT NULL constraint failed: users.email"),
 	},
-	{
+	"create user with password and email": {
 		u: model.User{Password: "secret", Email: "kermit@sesamstrasse.de"},
 	},
-	{
+	"create user with same email": {
 		u: model.User{Password: "secret", Email: "kermit@sesamstrasse.de"},
 		e: fmt.Errorf("UNIQUE constraint failed: users.email"),
 	},
-	{
+	"create valid new user": {
 		u: model.User{Password: "secret", Email: "grobi@sesamstrasse.de"},
 	},
 }
@@ -52,23 +52,28 @@ func TestCreateDifferentUser(t *testing.T) {
 	m := migration.NewMigrator(Instance)
 	m.Migration()
 
-	for _, tc := range dbCreateUserTests {
-		r := Instance.Debug().Create(&tc.u)
-		if tc.e != nil {
-			if r.Error.Error() != tc.e.Error() {
-				t.Fatalf("expected '%v', but got '%v'\n", tc.e, r.Error)
+	for name, tc := range dbCreateUserTests {
+		t.Run(name, func(t *testing.T) {
+			r := Instance.Debug().Create(&tc.u)
+			if tc.e != nil {
+				if r.Error == nil {
+					t.Fatalf("expected '%v', but got 'nil'\n", tc.e)
+				}
+				if r.Error.Error() != tc.e.Error() {
+					t.Fatalf("expected '%v', but got '%v'\n", tc.e, r.Error)
+				}
+			} else {
+				if r.Error != nil {
+					t.Fatalf("exptected no error, but got '%v'\n", r.Error)
+				}
 			}
-		} else {
-			if r.Error != nil {
-				t.Fatalf("exptected no error, but got '%v'\n", r.Error)
+
+			if tc.u.Active != true {
+				t.Fatalf("user '%v' should be active, but is '%v'\n", tc.u.Email, tc.u.Active)
 			}
-		}
+			fmt.Printf("create user id:%v\n", tc.u.ID)
+		})
 
-		if tc.u.Active != true {
-			t.Fatalf("user '%v' should be active, but is '%v'\n", tc.u.Email, tc.u.Active)
-		}
-
-		fmt.Printf("create user id:%v\n", tc.u.ID)
 	}
 
 	users := []model.User{}

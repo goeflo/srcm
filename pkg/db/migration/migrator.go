@@ -18,7 +18,6 @@ func NewMigrator(db *gorm.DB) Migrator {
 func (m *Migrator) Migration() {
 	if err := m.DB.AutoMigrate(
 		&model.User{},
-		&model.Event{},
 		&model.Participation{},
 	); err != nil {
 		log.Fatal(err)

@@ -34,4 +34,6 @@ func (b *Backend) adminRoutes(r chi.Router) {
 func (b *Backend) dataRoutes(r chi.Router) {
 	r.Use(middleware.UserAuthenticator)
 	r.Get("/user/{id}", b.handler.GetUser)
+
+	r.Post("/event/race/{id}/results", b.handler.AddResults)
 }
