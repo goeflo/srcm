@@ -1,10 +1,8 @@
 package handler
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -72,11 +70,16 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	d := &LoginRequestData{}
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		respondError(w, http.StatusBadRequest, err.Error())
-	}
-	json.Unmarshal(body, d)
+
+	d.Email = r.PostFormValue("email")
+	d.Passwd = r.PostFormValue("passwd")
+	log.Printf("login request data %+v\n", d)
+
+	// body, err := io.ReadAll(r.Body)
+	// if err != nil {
+	// 	respondError(w, http.StatusBadRequest, err.Error())
+	// }
+	// json.Unmarshal(body, d)
 
 	// get first element from db where email matches
 	user := model.User{}

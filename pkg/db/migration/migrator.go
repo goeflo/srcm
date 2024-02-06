@@ -19,6 +19,9 @@ func (m *Migrator) Migration() {
 	if err := m.DB.AutoMigrate(
 		&model.User{},
 		&model.Participation{},
+		&model.Season{},
+		&model.Race{},
+		&model.RaceResult{},
 	); err != nil {
 		log.Fatal(err)
 	}

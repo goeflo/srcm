@@ -1,18 +1,55 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de">
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <link type="text/css" rel="stylesheet" href="/assets/css/style.css">
+    <script src="/assets/js/htmx.min.js"></script>
+
+    <!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css" integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">-->
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">-->
+    
     <title>Document</title>
 </head>
 <body>
-    <h1>Hallo SRCM</h1>
+    <div class="container">
 
+    <h1>Hallo SRCM</h1>
+    <form>
+            <label for="email">email</label>
+            <input type="text" name="email" id="email" class="form-control" />
+            <label for="passwd">password</label>
+            <input type="passwd" name="passwd" id="passwd" class="form-control" />
+            <button hx-post="/login" hx-trigger="click" hx-target="#result">login</button>
+    </form>
+
+    <p id="result"></p>
+
+    <dl>
+        <dt>seasions</dt>
+        {{range .seasons}}<dd>season</dd>{{end}}
+    </dl>
     
+    <form hx-post="/event/season" hx-target="" hx-swap="">
+        <div class="form-group">
+            <label for="season-name">Name</label>
+            <input type="text" name="name" id="season-name" class="form-control" />
+            <button type="submit" class="btn">add season</button>
+        </div>
+    </form>
+
+    </div>
+
 </body>
+
+<script>
+    document.getElementById("result").addEventListener("htmx:afterSwap", function (e) {
+        if(document.getElementById("result").innerHTML === "Logged in!"){
+            window.location.href = "/"
+        }
+    })
+</script>
 
 </html>

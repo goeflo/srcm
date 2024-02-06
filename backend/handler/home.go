@@ -4,6 +4,8 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+
+	"github.com/floriwan/srcm/pkg/db/model"
 )
 
 var ext = ".html"
@@ -19,6 +21,11 @@ func (h *Handler) Home(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tmpl := template.Must(file, err)
+
+	seasons := []model.Season{}
+	res := h.DB.Find(&seasons)
+	log.Printf("number of seasons: %v\n", res.RowsAffected)
+
 	tmpl.Execute(w, nil)
 
 	//h.Tmpl.ExecuteTemplate(w, "public/index.html")

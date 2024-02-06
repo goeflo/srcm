@@ -7,9 +7,16 @@ import (
 )
 
 func (h *Handler) Assets(w http.ResponseWriter, r *http.Request) {
-	log.Printf("asset handler %v\n", r.URL.Path)
-	filename := strings.TrimRight(r.URL.Path, "/")
-	w.Header().Set("Content-Type", "text/css; charset=utf-8")
+
+	filename := strings.TrimLeft(r.URL.Path, "/")
+	log.Printf("asset handler %v\n", filename)
+
+	if strings.Contains(filename, "js") {
+		w.Header().Set("Content-Type", "text/javascript; charset=utf-8")
+	} else if strings.Contains(filename, "css") {
+		w.Header().Set("Content-Type", "text/css; charset=utf-8")
+	}
+
 	http.ServeFile(w, r, filename)
 }
 

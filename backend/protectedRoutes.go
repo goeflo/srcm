@@ -26,14 +26,14 @@ func (b *Backend) adminRoutes(r chi.Router) {
 	r.Delete("/user/{id}", b.handler.DeleteUser)
 	r.Post("/user", b.handler.CreateUser)
 
-	//r.Post("/event", handler.CreateEvent)
-	//r.Get("/event/{id}", handler.GetEvent)
+	r.Post("/event/season", b.handler.AddSeason)
+	r.Post("/event/season/{id}/race", b.handler.AddRace)
 
+	r.Post("/event/race/{id}/results", b.handler.AddResults)
 }
 
 func (b *Backend) dataRoutes(r chi.Router) {
 	r.Use(middleware.UserAuthenticator)
 	r.Get("/user/{id}", b.handler.GetUser)
 
-	r.Post("/event/race/{id}/results", b.handler.AddResults)
 }
