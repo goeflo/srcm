@@ -27,6 +27,7 @@ func (b *Backend) adminRoutes(r chi.Router) {
 	r.Post("/user", b.handler.CreateUser)
 
 	r.Post("/event/season", b.handler.AddSeason)
+	r.Get("/event/season", b.handler.GetSeason)
 	r.Post("/event/season/{id}/race", b.handler.AddRace)
 
 	r.Post("/event/race/{id}/results", b.handler.AddResults)

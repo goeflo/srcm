@@ -10,8 +10,8 @@ type User struct {
 	Lastname         string  `gorm:"type:varchar(50)" json:"lastname"`
 	Firstname        string  `gorm:"type:varchar(50)" json:"firstname"`
 	Password         string  `gorm:"type:varchar(50)" json:"password"`
-	Email            string  `gorm:"type:varchar(50);uniqueIndex;not null;default:null" json:"email"`
-	SteamID          string  `gorm:"type:varchar(20);not null" json:"steamID"`
+	Email            string  `gorm:"type:varchar(50);unique;not null;default:null" json:"email"`
+	SteamID          string  `gorm:"type:varchar(20);unique;not null" json:"steamID"`
 	VerificationCode *string `json:"verificationCode"`
 	Verified         bool    `gorm:"not null" json:"verified"`
 	Active           bool    `gorm:"type:bool;default:true;not null" json:"active"`

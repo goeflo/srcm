@@ -34,7 +34,7 @@ func PolulateInitialData() {
 		}
 
 		// create user
-		user = &model.User{Email: "user", Admin: false}
+		user = &model.User{Email: "user", Admin: false, SteamID: "0815"}
 		user.HashPassword("1234")
 		res = Instance.Create(&user)
 		if res.Error != nil {

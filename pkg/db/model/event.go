@@ -6,7 +6,7 @@ import (
 
 type Season struct {
 	gorm.Model
-	Name string
+	Name string `gorm:"type:varchar(50);unique;not null" json:"name"`
 }
 
 type Race struct {
