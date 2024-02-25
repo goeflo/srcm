@@ -11,7 +11,7 @@ type Season struct {
 
 type Race struct {
 	gorm.Model
-	SeasonID int
+	SeasonID uint
 	Name     string `gorm:"type:varchar(50);unique;not null" json:"name"`
 }
 
