@@ -12,7 +12,7 @@ type Season struct {
 type Race struct {
 	gorm.Model
 	SeasonID int
-	Name     string
+	Name     string `gorm:"type:varchar(50);unique;not null" json:"name"`
 }
 
 type RaceResult struct {
@@ -20,7 +20,8 @@ type RaceResult struct {
 	RaceID           int
 	Pos              uint
 	StartPos         uint
-	Participant      string
+	Driver           string `gorm:"type:varchar(50)" json:"driver"`
+	Team             string
 	Car              string
 	Class            string
 	TotalTime        uint
@@ -28,4 +29,5 @@ type RaceResult struct {
 	BestCleanLapTime uint
 	CalculatedPoints uint
 	FinalPoints      uint
+	Laps             uint
 }

@@ -2,8 +2,12 @@
 
 APPLICATION_NAME ?= srcm
 
-build:
-	docker build -t ${APPLICATION_NAME} -f Dockerfile .
+run: build
+	@./bin/${APPLICATION_NAME}
 
-run:
-	docker run ${APPLICATION_NAME} -p 8081:8081
+build:
+	@go build -o bin/${APPLICATION_NAME}
+
+test:
+	@go test -v ./...
+	

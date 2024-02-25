@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/go-chi/chi v1.5.5
 	github.com/go-chi/render v1.0.3
+	github.com/gorilla/mux v1.8.1
 	github.com/lestrrat-go/jwx/v2 v2.0.19
 	github.com/spf13/viper v1.18.2
 	golang.org/x/crypto v0.17.0

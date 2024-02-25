@@ -297,3 +297,14 @@ type contextKey struct {
 func (k *contextKey) String() string {
 	return "jwtauth context value " + k.name
 }
+
+/*
+func WithJWTAuth(handleFunc http.HandlerFunc, store store.Store) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		tokenAuth := New("HS256", []byte("secret"), nil, jwt.WithAcceptableSkew(30*time.Second))
+		return Verifier(tokenAuth)
+
+	}
+
+}
+*/

@@ -13,7 +13,6 @@ import (
 func (b *Backend) protectedRoutes(r chi.Router) {
 	tokenAuth := jwtauth.New("HS256", []byte("secret"), nil, jwt.WithAcceptableSkew(30*time.Second))
 	r.Use(jwtauth.Verifier(tokenAuth))
-	//r.Use(jwtauth.Authenticator(tokenAuth))
 
 	r.Group(b.adminRoutes)
 	r.Group(b.dataRoutes)
