@@ -15,6 +15,14 @@ type Race struct {
 	Name     string `gorm:"type:varchar(50);unique;not null" json:"name"`
 }
 
+type Driver struct {
+	gorm.Model
+	UserID   uint
+	RaceID   uint
+	Name     string `gorm:"type:varchar(50);unique;not null" json:"name"`
+	TeamName string `gorm:"type:varchar(50);unique;not null" json:"teamName"`
+}
+
 type RaceResult struct {
 	gorm.Model
 	RaceID           int

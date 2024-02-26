@@ -17,18 +17,17 @@ func main() {
 		log.Fatal("could not load configation file", err)
 	}
 
+	// create slqLite database
 	dbConfig := db.SqlLiteConfig{
 		Filename: config.GlobalConfig.DbSqliteFilename,
 	}
 
-	sqlStorage := db.NewSqlLiteStorage(dbConfig)
-	sqlStorage.PolulateInitialData()
-	store := store.NewStore(sqlStorage)
-	server := api.NewAPIServer(config.GlobalConfig.HttpPort, *store)
-	server.Serve()
+	sqlDB := db.NewSqlLiteDB(dbConfig)
+	sqlDB.PolulateInitialData()
 
-	// start backend
-	//backend := backend.Initialize()
-	//backend.Run()
+	// start api server
+	store := store.NewStorage(sqlDB)
+	server := api.NewAPIServer(config.GlobalConfig.HttpPort, store)
+	server.Serve()
 
 }

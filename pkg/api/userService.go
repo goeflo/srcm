@@ -17,11 +17,11 @@ type loginData struct {
 }
 
 type UserService struct {
-	store   store.Storage
+	store   store.Store
 	jwtAuth *jwtauth.JWTAuth
 }
 
-func NewUserService(s store.Storage, auth *jwtauth.JWTAuth) *UserService {
+func NewUserService(s store.Store, auth *jwtauth.JWTAuth) *UserService {
 	return &UserService{
 		store:   s,
 		jwtAuth: auth,
@@ -57,7 +57,7 @@ func (s *UserService) handleUserLogin(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("login request data %+v\n", d)
 
-	user, err := s.store.GetUser(d.Email)
+	user, err := s.store.GetUser("")
 	if err != nil {
 		WriteJSON(w, http.StatusBadRequest, ErrorResponse{Error: "unknown user " + d.Email})
 		return

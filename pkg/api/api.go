@@ -12,11 +12,11 @@ import (
 
 type APIServer struct {
 	port    string
-	store   store.Storage
+	store   store.Store
 	jwtAuth *jwtauth.JWTAuth
 }
 
-func NewAPIServer(port string, store store.Storage) *APIServer {
+func NewAPIServer(port string, store store.Store) *APIServer {
 	return &APIServer{
 		port:  port,
 		store: store,

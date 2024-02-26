@@ -8,72 +8,86 @@ import (
 	"github.com/floriwan/srcm/pkg/db/model"
 )
 
-type Storage struct {
-	db *db.SqlStorage
-}
-
 type Store interface {
-	CreateUser(u *model.User)
-	GetUser(name string)
-	CreateSeasons(name string)
-	GetSeasons()
+	AddUser(u *model.User) error
+	GetUser(email string) (*model.User, error)
+
+	AddSeason(name string) (*model.Season, error)
+	GetSeasons() ([]model.Season, error)
+	GetSeasonByID(ID uint) (*model.Season, error)
+
+	AddRace(raceName string, seasonID uint) (*model.Race, error)
+	GetRaceByID(ID uint) (*model.Race, error)
+
+	AddDriver(driverName string, teamName string, raceID uint) (*model.Driver, error)
 }
 
-func NewStore(db *db.SqlStorage) *Storage {
+type Storage struct {
+	db *db.SqlLiteDB
+}
+
+func NewStorage(db *db.SqlLiteDB) *Storage {
 	return &Storage{
 		db: db,
 	}
 }
 
-func (s *Storage) CreateUser(u model.User) error {
+func (s *Storage) AddUser(u *model.User) error {
 	return nil
 }
 
 func (s *Storage) GetUser(email string) (*model.User, error) {
 	user := model.User{}
-	res := s.db.DB.Where(&model.User{Email: email, Active: true}).First(&user)
-	if res.Error != nil {
-		return nil, res.Error
+	if err := s.db.DB.Where(&model.User{Email: email, Active: true}).First(&user).Error; err != nil {
+		return nil, err
 	}
 	return &user, nil
 }
 
 func (s *Storage) GetSeasons() ([]model.Season, error) {
 	seasons := []model.Season{}
-	res := s.db.DB.Find(&seasons)
-	if res.Error != nil {
-		return seasons, res.Error
+	if err := s.db.DB.Find(&seasons).Error; err != nil {
+		return seasons, err
 	}
 	return seasons, nil
 }
 
-func (s *Storage) CreateSeason(name string) (*model.Season, error) {
+func (s *Storage) AddSeason(name string) (*model.Season, error) {
+	log.Printf("CreateSeason name:%v\n", name)
 	season := model.Season{Name: name}
-	res := s.db.DB.Create(&season)
-	if res.Error != nil {
-		return nil, res.Error
+	if err := s.db.DB.Create(&season).Error; err != nil {
+		return nil, err
 	}
 	return &season, nil
 }
 
-func (s *Storage) GetSaeson(name string) (*model.Season, error) {
+func (s *Storage) GetSeasonByID(ID uint) (*model.Season, error) {
+	log.Printf("GetSeasonByID ID:%v\n", ID)
 	season := model.Season{}
-	res := s.db.DB.Where(&model.Race{Name: name}).First(&season)
-	if res.Error != nil {
-		return nil, res.Error
+	if err := s.db.DB.First(&season, ID).Error; err != nil {
+		return nil, err
 	}
 	return &season, nil
 }
 
-func (s *Storage) CreateRace(raceName string, seasonName string) (*model.Race, error) {
-	if raceName == "" || seasonName == "" {
+func (s *Storage) GetSeason(name string) (*model.Season, error) {
+	log.Printf("GetSeason name:%v\n", name)
+	season := model.Season{}
+	if err := s.db.DB.Where(&model.Season{Name: name}).First(&season).Error; err != nil {
+		return nil, err
+	}
+	return &season, nil
+}
+
+func (s *Storage) AddRace(raceName string, seasonID uint) (*model.Race, error) {
+	if raceName == "" || seasonID == 0 {
 		return nil, fmt.Errorf("race name and season name must be set")
 	}
 
 	race := model.Race{Name: raceName}
-	log.Printf("create race '%v' in season '%v'\n", raceName, seasonName)
+	log.Printf("create race '%v' in season ID '%v'\n", raceName, seasonID)
 
-	season, err := s.GetSaeson(seasonName)
+	season, err := s.GetSeasonByID(seasonID)
 	if err != nil {
 		return nil, err
 	}
@@ -86,4 +100,31 @@ func (s *Storage) CreateRace(raceName string, seasonName string) (*model.Race, e
 	}
 	return &race, nil
 
+}
+
+func (s *Storage) GetRaceByID(ID uint) (*model.Race, error) {
+	log.Printf("GetRaceByID ID:%v\n", ID)
+	race := model.Race{}
+	if err := s.db.DB.First(&race, ID).Error; err != nil {
+		return nil, err
+	}
+	return &race, nil
+}
+
+func (s *Storage) AddDriver(driverName string, teamName string, raceID uint) (*model.Driver, error) {
+	if driverName == "" {
+		return nil, fmt.Errorf("driver name must be set")
+	}
+
+	race, err := s.GetRaceByID(raceID)
+	if err != nil {
+		return nil, err
+	}
+
+	driver := model.Driver{Name: driverName, TeamName: teamName, RaceID: race.ID}
+	res := s.db.DB.Create(&driver)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+	return &driver, nil
 }

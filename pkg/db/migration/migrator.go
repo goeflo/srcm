@@ -22,6 +22,7 @@ func (m *Migrator) Migration() {
 		&model.Season{},
 		&model.Race{},
 		&model.RaceResult{},
+		&model.Driver{},
 	); err != nil {
 		log.Fatal(err)
 	}
