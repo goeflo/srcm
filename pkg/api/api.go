@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"io/fs"
 	"log"
 	"net/http"
 
@@ -11,22 +12,30 @@ import (
 )
 
 type APIServer struct {
-	port    string
-	store   store.Store
-	jwtAuth *jwtauth.JWTAuth
+	apiPort        string
+	staticHtmlPort string
+	store          store.Store
+	jwtAuth        *jwtauth.JWTAuth
+	public         fs.FS
 }
 
-func NewAPIServer(port string, store store.Store) *APIServer {
+func NewAPIServer(htmlPort string, apiPort string, store store.Store, public fs.FS) *APIServer {
 	return &APIServer{
-		port:  port,
-		store: store,
+		apiPort:        apiPort,
+		staticHtmlPort: htmlPort,
+		store:          store,
 		//jwtAuth: jwtauth.New("HS256", []byte("secret"), nil, jwt.WithAcceptableSkew(30*time.Second)),
 		jwtAuth: jwtauth.New("HS256", []byte("secret"), nil),
+		public:  public,
 	}
 }
 
 func (s *APIServer) Serve() {
+
 	router := mux.NewRouter()
+	fs := http.FileServer(http.FS(s.public))
+	http.Handle("/", fs)
+
 	subrouter := router.PathPrefix("/api/v1").Subrouter()
 
 	userService := NewUserService(s.store, s.jwtAuth)
@@ -35,9 +44,17 @@ func (s *APIServer) Serve() {
 	eventService := NewEventService(s.store, s.jwtAuth)
 	eventService.RegisterRoutes(subrouter)
 
-	addr := ":" + s.port
-	log.Printf("starting server on %v\n", addr)
-	log.Fatal(http.ListenAndServe(addr, subrouter))
+	// start the API server
+	go func() {
+		addr := ":" + s.apiPort
+		log.Printf("starting api server on %v\n", addr)
+		log.Fatal(http.ListenAndServe(addr, subrouter))
+	}()
+
+	// start static file server
+	addr := ":" + s.staticHtmlPort
+	log.Printf("starting http server on %v\n", addr)
+	log.Fatal(http.ListenAndServe(addr, nil))
 
 }
 

@@ -22,9 +22,10 @@ type NewRaceData struct {
 }
 
 type NewDriverData struct {
-	Name     string `json:"name"`
-	TeamName string `json:"teamName"`
-	UserID   uint   `json:"userID"`
+	Name      string `json:"name"`
+	TeamName  string `json:"teamName"`
+	CarNumber uint   `json:"carNumber"`
+	UserID    uint   `json:"userID"`
 }
 
 type EventService struct {
@@ -48,6 +49,11 @@ func (e *EventService) RegisterRoutes(r *mux.Router) {
 
 	r.HandleFunc("/event/race/{id}/driver", e.handleAddDriver).Methods("POST")
 	r.HandleFunc("/event/race/{id}/driver", e.handleGetDriver).Methods("GET")
+
+	r.HandleFunc("/event/race/{id}/result", e.handleRaceResult).Methods("POST")
+}
+
+func (s *EventService) handleRaceResult(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *EventService) handleGetDriver(w http.ResponseWriter, r *http.Request) {
@@ -87,7 +93,7 @@ func (s *EventService) handleAddDriver(w http.ResponseWriter, r *http.Request) {
 
 	for _, driver := range driverData {
 		log.Printf("add driver %v (%v) to race '%v'\n", driver.Name, driver.TeamName, race.Name)
-		driver, err := s.store.AddDriver(driver.Name, driver.TeamName, uint(id))
+		_, err := s.store.AddDriver(driver.Name, driver.TeamName, uint(id))
 		if err != nil {
 			WriteJSON(w, http.StatusBadRequest, ErrorResponse{Error: "can not add driver '" + driver.Name + "' to race '" + race.Name + "' " + err.Error()})
 			return
